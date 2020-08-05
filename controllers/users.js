@@ -63,21 +63,22 @@ exports.createUser = async (req, res, next) => {
 //@response success, token
 
 exports.loginUser = async (req, res, next) => {
-  let email = req.body.emaill;
+  let email = req.body.email;
   let passwd = req.body.passwd;
   console.log(passwd);
-  let query = `select * from book_user where email = "${email}"`;
+  let query = `select * from book_user where email = ?`;
+  let data = [email];
   console.log(query);
 
   let user_id;
 
   try {
+    [rows] = await connection.query(query, data);
     console.log(rows);
-    // let savedPasswd = rows[0].passwd;
     let savedPasswd = rows[0].passwd;
     console.log("**************", savedPasswd);
     user_id = rows[0].id;
-    const isMatch = await bcrypt.compareSync(passwd, savedPasswd);
+    let isMatch = await bcrypt.compareSync(passwd, savedPasswd);
 
     if (isMatch == false) {
       res.status(401).json({ success: false });
