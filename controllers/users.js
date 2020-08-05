@@ -12,7 +12,7 @@ const connection = require("../db/mysql_connection");
 exports.createUser = async (req, res, next) => {
   let email = req.body.email;
   let passwd = req.body.passwd;
-
+  let age = req.body.age;
   if (!email || !passwd) {
     res.status(400).json();
     return;
@@ -24,8 +24,8 @@ exports.createUser = async (req, res, next) => {
 
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
-  let query = `insert into book_user (email, passwd) values (?,?);`;
-  let data = [email, hashedPasswd];
+  let query = `insert into book_user (email, passwd,age) values (?,?,?);`;
+  let data = [email, hashedPasswd, age];
 
   let user_id;
 
@@ -65,23 +65,27 @@ exports.createUser = async (req, res, next) => {
 exports.loginUser = async (req, res, next) => {
   let email = req.body.emaill;
   let passwd = req.body.passwd;
-
-  let query = `select * from book_user where email = ? `;
-  let data = [email];
+  console.log(passwd);
+  let query = `select * from book_user where email = "${email}"`;
+  console.log(query);
 
   let user_id;
 
   try {
-    [rows] = await connection.query(query, data);
-    let hashedPasswd = rows[0].passwd;
+    console.log(rows);
+    // let savedPasswd = rows[0].passwd;
+    let savedPasswd = rows[0].passwd;
+    console.log("**************", savedPasswd);
     user_id = rows[0].id;
-    const isMatch = await bcrypt.compare(passwd, hashedPasswd);
+    const isMatch = await bcrypt.compareSync(passwd, savedPasswd);
+
     if (isMatch == false) {
-      res.status(401).json();
+      res.status(401).json({ success: false });
       return;
     }
   } catch (e) {
-    res.status(500).json();
+    console.log(e);
+    res.status(600).json({ success: false });
     return;
   }
   const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
