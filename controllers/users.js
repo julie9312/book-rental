@@ -24,7 +24,7 @@ exports.createUser = async (req, res, next) => {
 
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
-  let query = "insert into book_user (email, passwd) values (?,?)";
+  let query = `select * from book_user where email = "${email}"`;
   let data = [email, hashedPasswd];
 
   let user_id;
@@ -66,7 +66,7 @@ exports.loginUser = async (req, res, next) => {
   let email = req.body.emaill;
   let passwd = req.body.passwd;
 
-  let query = `select * from book_user where email =?; `;
+  let query = `select * from book_user where email = ? `;
   let data = [email];
 
   let user_id;

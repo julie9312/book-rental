@@ -20,7 +20,6 @@ app.use("/api/v1/users", users);
 
 const PORT = process.env.PORT || 5800;
 
-app.listen(PORT, console.log("API SERVER WORKING"));
-
-const logger = require("./middleware/logger");
-const errorHandler = require("./middleware/error");
+app.listen(PORT, () => {
+  console.log(`Server running in port ${PORT}`);
+});
